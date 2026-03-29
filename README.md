@@ -139,6 +139,3 @@ Recommended Vercel setup:
 3. Run lint and build checks before opening a pull request.
 4. Provide a concise change summary and testing notes.
 
-## License
-
-No license file is currently included in this repository.
