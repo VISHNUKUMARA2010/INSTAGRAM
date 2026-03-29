@@ -1,7 +1,7 @@
 import { Box, Button, Container, Flex, Skeleton, SkeletonCircle, Text, VStack } from "@chakra-ui/react";
 import { useState } from "react";
 import FeedPost from "./FeedPost";
-import useGetFeedPosts from "../../hooks/useGetFeedPosts";
+import useGetFeedPosts from "../../hooks/UseGetFeedPosts";
 import useAuthStore from "../../store/authStore";
 
 const FeedPosts = () => {
