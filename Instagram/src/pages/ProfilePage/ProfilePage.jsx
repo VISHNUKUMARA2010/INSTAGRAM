@@ -1,23 +1,25 @@
-import { Container, Flex, Link, SkeletonCircle, Text, VStack } from "@chakra-ui/react";
+import { Container, Flex, Link, Skeleton, SkeletonCircle, Text, VStack } from "@chakra-ui/react";
 import ProfileHeader from "../../components/Profile/ProfileHeader";
 import ProfileTabs from "../../components/Profile/ProfileTabs";
 import ProfilePosts from "../../components/Profile/ProfilePosts";
-import useGetUSerProfileByUsername from "../../hooks/useGetUserProfileByUsername";
+import useGetUserProfileByUsername from "../../hooks/useGetUserProfileByUsername";
 import { useParams } from "react-router-dom";
 import { Link as RouterLink } from "react-router-dom";
+import { useState } from "react";
 
 const ProfilePage = () => {
+    const [activeTab, setActiveTab] = useState("posts");
     const { username } = useParams();
     const { isLoading, userProfile } = useGetUserProfileByUsername(username);
 
     const userNotFound = !isLoading && !userProfile;
-    if (userNotFound) return <userNotFound />;
+    if (userNotFound) return <UserNotFound />;
 
     return (
         <Container maxW='container.lg' py={5}>
             <Flex py={10} px={4} pl={{ base: 4, md: 10 }} w={"full"} mx={"auto"} flexDirection={"column"}>
                 {!isLoading && userProfile && <ProfileHeader />}
-                {!isLoading && <ProfileHeaderSkeleton />}
+                {isLoading && <ProfileHeaderSkeleton />}
             </Flex>
             <Flex
                 px={{ base: 2, sm: 4 }}
@@ -27,8 +29,8 @@ const ProfilePage = () => {
                 borderColor={"whiteAlpha.300"}
                 direction={"column"}
             >
-                <ProfileTabs />
-                <ProfilePosts />
+                <ProfileTabs activeTab={activeTab} onTabChange={setActiveTab} />
+                <ProfilePosts activeTab={activeTab} />
             </Flex>
         </Container>
     );

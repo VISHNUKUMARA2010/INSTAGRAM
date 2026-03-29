@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Flex, Skeleton, SkeletonCircule } from "@chakra-ui/react";
+import { Avatar, Box, Button, Flex, Skeleton, SkeletonCircle } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import useFollowUser from "../../hooks/useFollowUser";
 import { timeAgo } from "../../utils/timeAgo";
@@ -14,7 +14,7 @@ const PostHeader = ({ post, creatorProfile }) => {
                         <Avatar src={creatorProfile.profilePicURL} alt='user profile pic' size={"sm"} />
                     </Link>
                 ) : (
-                    <SkeletonCircule size='10' />
+                    <SkeletonCircle size='10' />
                 )}
 
                 <Flex fontSize={12} fontWeight={"bold"} gap='2'>

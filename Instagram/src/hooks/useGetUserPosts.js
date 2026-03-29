@@ -9,11 +9,15 @@ const useGetUserPosts = () => {
     const [isLoading, setIsLoading] = useState(true);
     const { posts, setPosts } = usePostStore();
     const showToast = useShowToast();
-    const userProfile = useUSerProfileStore((state) => state.userProfile);
+    const userProfile = useUserProfileStore((state) => state.userProfile);
 
     useEffect(() => {
         const getPosts = async () => {
-            if (!userProfile) return;
+            if (!userProfile) {
+                setPosts([]);
+                setIsLoading(false);
+                return;
+            }
             setIsLoading(true);
             setPosts([]);
 

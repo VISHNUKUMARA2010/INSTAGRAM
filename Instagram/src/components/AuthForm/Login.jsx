@@ -16,7 +16,7 @@ const Login = () => {
                 type='email'
                 size={"sm"}
                 value={inputs.email}
-                pnChange={(e) => setInputs({ ...inputs, email: e.target.value })}
+                onChange={(e) => setInputs({ ...inputs, email: e.target.value })}
             />
             <Input
                 placeholder='Password'

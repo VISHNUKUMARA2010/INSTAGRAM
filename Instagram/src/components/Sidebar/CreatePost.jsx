@@ -1,9 +1,7 @@
 import {
     Box,
     Button,
-    CloseButton,
     Flex,
-    Image,
     Input,
     Modal,
     ModalBody,
@@ -12,37 +10,53 @@ import {
     ModalFooter,
     ModalHeader,
     ModalOverlay,
+    Select,
     Textarea,
     Tooltip,
     useDisclosure,
 } from "@chakra-ui/react";
 import { CreatePostLogo } from "../../assets/constants";
-import { BsFillImageFill } from "react-icons/bs";
-import { useRef, useState } from "react";
-import usePreviewImg from "../../hooks/usePreviewImg";
+import { useState } from "react";
 import useShowToast from "../../hooks/useShowToast";
 import useAuthStore from "../../store/authStore";
 import usePostStore from "../../store/postStore";
 import useUserProfileStore from "../../store/userProfileStore";
 import { useLocation } from "react-router-dom";
 import { addDoc, arrayUnion, collection, doc, updateDoc } from "firebase/firestore";
-import { firestore, storage } from "../../firebase/firebase";
-import { getDownloadURL, ref, uploadString } from "firebase/storage";
+import { firestore } from "../../firebase/firebase";
+import ReactPlayer from "react-player";
+
+const normalizeVideoUrl = (url) => {
+    const trimmedUrl = url.trim();
+
+    if (trimmedUrl.includes("youtube.com/shorts/")) {
+        const videoId = trimmedUrl.split("shorts/")[1]?.split("?")[0];
+        return videoId ? `https://www.youtube.com/watch?v=${videoId}` : trimmedUrl;
+    }
+
+    if (trimmedUrl.includes("youtu.be/")) {
+        const videoId = trimmedUrl.split("youtu.be/")[1]?.split("?")[0];
+        return videoId ? `https://www.youtube.com/watch?v=${videoId}` : trimmedUrl;
+    }
+
+    return trimmedUrl;
+};
 
 const CreatePost = () => {
-    const { isOpen, onOpen, onClose } =useDisclosure();
+    const { isOpen, onOpen, onClose } = useDisclosure();
     const [caption, setCaption] = useState("");
-    const imageRef = useRef(null);
-    const { handleImageChange, selectedFile, setSelectedFile } = usePreviewImg();
+    const [mediaURL, setMediaURL] = useState("");
+    const [mediaType, setMediaType] = useState("image");
     const showToast = useShowToast();
     const { isLoading, handleCreatePost } = useCreatePost();
 
     const handlePostCreation = async () => {
         try {
-            await handleCreatePost(selectedFile, caption);
+            await handleCreatePost(mediaURL, caption, mediaType);
             onClose();
             setCaption("");
-            setSelectedFile(null);
+            setMediaURL("");
+            setMediaType("image");
         } catch (error) {
             showToast("Error", error.message, "error");
         }
@@ -86,26 +100,18 @@ const CreatePost = () => {
                         onChange={(e) => setCaption(e.target.value)}
                     />
 
-                    <Input type='file' hidden ref={imageRef} onChange={handleImageChange} />
+                    <Select mt={4} value={mediaType} onChange={(e) => setMediaType(e.target.value)}>
+                        <option value='image'>Image Post</option>
+                        <option value='video'>Video Reel</option>
+                    </Select>
 
-                    <BsFillImageFill
-                        onClick={() => imageRef.current.click()}
-                        style={{ marginTop: "15px", marginLeft: "5px", cursor: "pointer" }}
-                        size={16}
+                    <Input
+                        mt={4}
+                        placeholder={mediaType === "video" ? "Video URL (https://...)" : "Image URL (https://...)"}
+                        type='url'
+                        value={mediaURL}
+                        onChange={(e) => setMediaURL(e.target.value)}
                     />
-                    {selectedFile && (
-                        <Flex mt={5} w={"full"} position={"relative"} justifyContent={"center"}>
-                            <Image src={selectedFile} alt='Selected img' />
-                            <CloseButton
-                                position={"absolute"}
-                                top={2}
-                                right={2}
-                                onClick={() => {
-                                    setSelectedFile(null);
-                                }}
-                            />
-                        </Flex>
-                    )}
                 </ModalBody>
 
                 <ModalFooter>
@@ -130,9 +136,28 @@ function useCreatePost() {
     const userProfile = useUserProfileStore((state) => state.userProfile);
     const { pathname } = useLocation();
 
-    const handleCreatePost = async (selectedFile, caption) => {
+    const handleCreatePost = async (mediaURL, caption, mediaType) => {
         if (isLoading) return;
-        if (!selectedFile) throw new Error("Please select an image");
+        if (!authUser) throw new Error("You must be logged in");
+        if (!mediaURL?.trim()) throw new Error("Please add a media URL");
+        const cleanedMediaURL = mediaURL.trim();
+        const normalizedMediaURL = mediaType === "video" ? normalizeVideoUrl(cleanedMediaURL) : cleanedMediaURL;
+
+        if (mediaType === "video") {
+            const isDirectVideo = /\.(mp4|webm|ogg|mov|m3u8)(\?.*)?$/i.test(normalizedMediaURL);
+            const isPlayableByProvider = ReactPlayer.canPlay(normalizedMediaURL);
+
+            if (!isDirectVideo && !isPlayableByProvider) {
+                throw new Error(
+                    "Unsupported video URL. Use a direct video file link (.mp4/.webm) or a supported link like YouTube."
+                );
+            }
+
+            if (normalizedMediaURL.includes("bing.com/videos/riverview")) {
+                throw new Error("Bing video page links are not direct playable video URLs.");
+            }
+        }
+
         setIsLoading(true);
         const newPost = {
             caption: caption,
@@ -140,27 +165,24 @@ function useCreatePost() {
             comments: [],
             createdAt: Date.now(),
             createdBy: authUser.uid,
+            imageURL: normalizedMediaURL,
+            mediaURL: normalizedMediaURL,
+            mediaType: mediaType || "image",
         };
 
         try {
             const postRef = await addDoc(collection(firestore, "posts"), newPost);
+            const postId = postRef.id;
             const userDocRef = doc(firestore, "users", authUser.uid);
-            const imageRef = ref(storage, `posts/${postDocRef.id}`);
 
-            await updateDoc(userDocRef, { posts: arrayUnion(postDocRef.id) });
-            await uploadString(imageRef, selectedFile, "data_url");
-            const downloadURL = await getDownloadURL(imageRef);
+            await updateDoc(userDocRef, { posts: arrayUnion(postId) });
 
-            await updateDoc(postDocRef, { imageURL: downloadURL });
+            if (userProfile?.uid === authUser.uid) createPost({ ...newPost, id: postId });
 
-            newPost.imageURL = downloadURL;
-
-            if (userProfile.uid === authUser.uid) createPost({ ...newPost, id: postDocRef.id });
-
-            if (pathname !== "/" && userProfile.uid === authUser.uid) addPost({ ...newPost, id: postDocRef.id });
+            if (pathname !== "/" && userProfile?.uid === authUser.uid) addPost({ ...newPost, id: postId });
 
             showToast("Success", "Post created successfully", "success");
-        }catch (error) {
+        } catch (error) {
             showToast("Error", error.message, "error");
         } finally {
             setIsLoading(false);

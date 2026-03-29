@@ -26,7 +26,7 @@ const useGetSuggestedUsers = () => {
                 const users = [];
 
                 querySnapshot.forEach((doc) => {
-                    user.push({ ...doc.data(), id: doc.id });
+                    users.push({ ...doc.data(), id: doc.id });
                 });
 
                 setSuggestedUSers(users);

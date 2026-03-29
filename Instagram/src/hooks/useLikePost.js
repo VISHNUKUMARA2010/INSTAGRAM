@@ -7,8 +7,9 @@ import { firestore } from "../firebase/firebase";
 const useLikePost = (post) => {
     const [isUpdating, setIsUpdating] = useState(false);
     const authUser = useAuthStore((state) => state.user);
-    const [likes, setIsLikes] = useState(post.likes.length);
-    const [isLinked, setIsLinked] = useState(post.likes.includes(authUser?.uid));
+    const initialLikes = Array.isArray(post?.likes) ? post.likes : [];
+    const [likes, setLikes] = useState(initialLikes.length);
+    const [isLiked, setIsLiked] = useState(initialLikes.includes(authUser?.uid));
     const showToast = useShowToast();
 
     const handleLikePost = async () => {
@@ -22,8 +23,8 @@ const useLikePost = (post) => {
                 likes: isLiked ? arrayRemove(authUser.uid) : arrayUnion(authUser.uid),
             });
 
-            setIsLinked(!isLiked);
-            isLiked ? setIsLikes(likes - 1) : setIsLikes(likes + 1);
+            setIsLiked(!isLiked);
+            isLiked ? setLikes(likes - 1) : setLikes(likes + 1);
         } catch (error) {
             showToast("Error", error.message, "error");
         } finally {

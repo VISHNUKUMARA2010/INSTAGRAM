@@ -1,19 +1,18 @@
 import React from "react";
 import ReactDom from "react-dom/client";
 import App from "./App.jsx";
-import ".index.css";
+import "./index.css";
 import { ChakraProvider } from "@chakra-ui/react";
 import { extendTheme } from "@chakra-ui/react";
-import { mode } from "@chakra-ui/theme-tools";
 import { BrowserRouter } from "react-router-dom";
 
 const styles = {
-    global: (props) => ({
+    global: {
         body: {
-            bg: mode("gray.100", "#000")(props),
-            color: mode("gray.800", "whiteAlpha.900")(props),
+            backgroundColor: "#000000",
+            color: "rgba(255, 255, 255, 0.92)",
         },
-    }),
+    },
 };
 
 const config = {

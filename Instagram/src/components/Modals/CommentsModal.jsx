@@ -19,7 +19,7 @@ const CommentsModal = ({ isOpen, onClose, post }) => {
     const commentsContainerRef = useRef(null);
     const handleSumbitComment = async (e) => {
         // do not refresh the page, prevent it
-        e.preventDefult();
+        e.preventDefault();
         await handlePostComment(post.id, commentRef.current.value);
         commentRef.current.value = "";
     };
@@ -33,7 +33,7 @@ const CommentsModal = ({ isOpen, onClose, post }) => {
                 scrollToBottom();
             }, 100);
         }
-    }, [isOpen, post.comment.length]);
+    }, [isOpen, post.comments.length]);
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} motionPreset='slideInLeft'>
@@ -54,14 +54,14 @@ const CommentsModal = ({ isOpen, onClose, post }) => {
                             <Comment key={idx} comment={comment} />
                         ))}
                     </Flex>
-                    <Form onSubmit={handleSumbitComment} style={{ marginTop: "2rem" }}>
+                    <form onSubmit={handleSumbitComment} style={{ marginTop: "2rem" }}>
                         <Input placeholder='Comment' size={"sm"} ref={commentRef} />
                         <Flex w={"full"} justifyContent={"flex-end"}>
                             <Button type='submit' ml={"auto"} size={"sm"} my={4} isLoading={isCommenting}>
                                 Post
                             </Button>
                         </Flex>
-                    </Form>
+                    </form>
                 </ModalBody>
             </ModalContent>
         </Modal>

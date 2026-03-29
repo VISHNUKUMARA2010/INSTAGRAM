@@ -13,8 +13,8 @@ import {
     ModalOverlay,
     Tooltip,
     useDisclosure,
-} from "@chakar-ui/react";
-import { SearchLogo } from "../../assets/constants";l
+} from "@chakra-ui/react";
+import { SearchIcon } from "../../assets/constants";
 import useSearchUser from "../../hooks/useSearchUser";
 import { useRef } from "react";
 import SuggestedUser from "../SuggestedUsers/SuggestedUser";
@@ -49,18 +49,18 @@ const Search = () => {
                     justifyContent={{ base: "center", md: "flex-start" }}
                     onClick={onOpen}
                 >
-                    <SearchLogo />
+                    <SearchIcon />
                     <Box display={{ base: "none", md: "block" }}>Search</Box>
                 </Flex>
             </Tooltip>
 
             <Modal isOpen={isOpen} onClose={onClose} motionPreset='slideInLeft'>
-                <ModalOverLay />
+                <ModalOverlay />
                 <ModalContent bg={"black"} border={"1px solid gray"} maxW={"400px"}>
                     <ModalHeader>Search user</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody pb={6}>
-                        <Form onSubmit={handleSearchUser}>
+                        <form onSubmit={handleSearchUser}>
                             <FormControl>
                                 <FormLabel>Username</FormLabel>
                                 <Input placeholder='asaprogrammer' ref={searchRef} />
@@ -71,7 +71,7 @@ const Search = () => {
                                     Search
                                 </Button>
                             </Flex>
-                        </Form>
+                        </form>
                         {user && <SuggestedUser user={user} setUser={setUser} />}
                     </ModalBody>
                 </ModalContent>

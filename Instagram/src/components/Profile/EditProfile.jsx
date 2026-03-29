@@ -1,7 +1,6 @@
 import {
     Avatar,
     Button,
-    Center,
     Flex,
     FormControl,
     FormLabel,
@@ -15,29 +14,44 @@ import {
     ModalOverlay,
     Stack,
 } from "@chakra-ui/react";
-import { useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import useAuthStore from "../../store/authStore";
-import usePreviewImg from "../../hooks/usePreviewImg";
 import useEditProfile from "../../hooks/useEditProfile";
 import useShowToast from "../../hooks/useShowToast";
+import { useNavigate } from "react-router-dom";
 
 const EditProfile = ({ isOpen, onClose }) => {
     const [inputs, setInputs] = useState({
         fullName: "",
         username: "",
         bio: "",
+        profilePicURL: "",
     });
     const authUser = useAuthStore((state) => state.user);
-    const fileRef = useRef(null);
-    const { handleImageChange, selectedFile, setSelectedFile } = usePreviewImg();
-    const { isUpdating, EditProfile } = useEditProfile();
+    const { isUpdating, editProfile } = useEditProfile();
     const showToast = useShowToast();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!authUser || !isOpen) return;
+        setInputs({
+            fullName: authUser.fullName || "",
+            username: authUser.username || "",
+            bio: authUser.bio || "",
+            profilePicURL: authUser.profilePicURL || "",
+        });
+    }, [authUser, isOpen]);
 
     const handleEditProfile = async () => {
         try {
-            await EditProfile(inputs, selectedFile);
-            setSelectedFile(null);
+            const updatedUser = await editProfile(inputs);
+            if (!updatedUser) return;
+
             onClose();
+
+            if (updatedUser.username && updatedUser.username !== authUser.username) {
+                navigate(`/${updatedUser.username}`);
+            }
         } catch (error) {
             showToast("Error", error.message, "error");
         }
@@ -58,21 +72,18 @@ const EditProfile = ({ isOpen, onClose }) => {
                                     Edit Profile
                                 </Heading>
                                 <FormControl>
-                                    <Stack direction={["colums", "row"]} spacing={6}>
-                                        <Center>
-                                            <Avatar
-                                                size='xl'
-                                                src={selectedFile || authUser.profilePicURL}
-                                                border={"2px solid white "}
-                                            />
-                                        </Center>
-                                        <Center w='full'>
-                                            <Button w='full' onClick={() => fileRef.current.click()}>
-                                                Edit Profile Picture
-                                            </Button>
-                                        </Center>
-                                        <Input type='file' hidden ref={fileRef} onChange={handleImageChange} />
-                                    </Stack>
+                                    <Avatar size='xl' src={inputs.profilePicURL || authUser.profilePicURL} border={"2px solid white"} />
+                                </FormControl>
+
+                                <FormControl>
+                                    <FormLabel fontSize={"sm"}>Profile Picture URL</FormLabel>
+                                    <Input
+                                        placeholder={"https://example.com/avatar.jpg"}
+                                        size={"sm"}
+                                        type={"url"}
+                                        value={inputs.profilePicURL}
+                                        onChange={(e) => setInputs({ ...inputs, profilePicURL: e.target.value })}
+                                    />
                                 </FormControl>
 
                                 <FormControl>
@@ -81,8 +92,8 @@ const EditProfile = ({ isOpen, onClose }) => {
                                         placeholder={"Full Name"}
                                         size={"sm"}
                                         type={"text"}
-                                        value={inputs.fullName || authUser.fullName}
-                                        ocChange={(e) => setInputs({ ...inputs, fullName: e.target.value })}
+                                        value={inputs.fullName}
+                                        onChange={(e) => setInputs({ ...inputs, fullName: e.target.value })}
                                     />
                                 </FormControl>
 
@@ -92,7 +103,7 @@ const EditProfile = ({ isOpen, onClose }) => {
                                         placeholder={"Username"}
                                         size={"sm"}
                                         type={"text"}
-                                        value={inputs.username || authUser.username}
+                                        value={inputs.username}
                                         onChange={(e) => setInputs({ ...inputs, username: e.target.value })}
                                     />
                                 </FormControl>
@@ -103,7 +114,7 @@ const EditProfile = ({ isOpen, onClose }) => {
                                         placeholder={"bio"}
                                         size={"sm"}
                                         type={"text"}
-                                        value={inputs.bio || authUser.bio}
+                                        value={inputs.bio}
                                         onChange={(e) => setInputs({ ...inputs, bio: e.target.value })}
                                     />
                                 </FormControl>

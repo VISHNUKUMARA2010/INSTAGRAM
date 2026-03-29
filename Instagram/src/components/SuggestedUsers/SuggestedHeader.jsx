@@ -21,7 +21,7 @@ const SuggestedHeader = () => {
                     </Text>
                 </Link>
             </Flex>
-            <button
+            <Button
                 size={"xs"}
                 background={"transparent"}
                 _hover={{ background: "transparent" }}
@@ -33,7 +33,7 @@ const SuggestedHeader = () => {
                 cursor={"pointer"}
             >
                 Log out
-            </button>
+            </Button>
         </Flex>
     );
 };

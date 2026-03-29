@@ -1,9 +1,34 @@
 import { Box, Flex, Grid, Skeleton, Text, VStack } from "@chakra-ui/react";
 import ProfilePost from "./ProfilePost";
-import useGetUserPosts from "../../hooks/useGEtUserPosts";
+import useGetUserPosts from "../../hooks/useGetUserPosts";
+import useAuthStore from "../../store/authStore";
 
-const ProfilePosts = () => {
+const ProfilePosts = ({ activeTab }) => {
     const { isLoading, posts } = useGetUserPosts();
+    const authUser = useAuthStore((state) => state.user);
+
+    if (activeTab === "saved") return <EmptyTabMessage text='Saved posts coming soon.' />;
+
+    if (activeTab === "likes") {
+        const likedPosts = posts.filter((post) => post.likes?.includes(authUser?.uid));
+        if (!isLoading && likedPosts.length === 0) return <EmptyTabMessage text='No liked posts yet.' />;
+        if (!isLoading) {
+            return (
+                <Grid
+                    templateColumns={{
+                        sm: "repeat(1, 1fr)",
+                        md: "repeat(3, 1fr)",
+                    }}
+                    gap={1}
+                    columnGap={1}
+                >
+                    {likedPosts.map((post) => (
+                        <ProfilePost post={post} key={post.id} />
+                    ))}
+                </Grid>
+            );
+        }
+    }
 
     const noPostsFound = !isLoading && posts.length === 0;
     if (noPostsFound) return <NoPostsFound />;
@@ -28,21 +53,29 @@ const ProfilePosts = () => {
 
                 {!isLoading && (
                     <>
-                        {posts.map((post) => {
+                        {posts.map((post) => (
                             <ProfilePost post={post} key={post.id} />
-                        })}
+                        ))}
                     </>
                 )}
         </Grid>
     );
 };
 
-export default ProfilePost;
+export default ProfilePosts;
 
 const NoPostsFound = () => {
     return (
-        <Flex flexDir='column' rexrAlign={"center"} ms={"auto"} mt={10}>
+        <Flex flexDir='column' textAlign={"center"} mx={"auto"} mt={10}>
             <Text fontSize={"2xl"}>No Posts Found🤔</Text>
+        </Flex>
+    );
+};
+
+const EmptyTabMessage = ({ text }) => {
+    return (
+        <Flex flexDir='column' textAlign={"center"} mx={"auto"} mt={10}>
+            <Text fontSize={"xl"}>{text}</Text>
         </Flex>
     );
 };

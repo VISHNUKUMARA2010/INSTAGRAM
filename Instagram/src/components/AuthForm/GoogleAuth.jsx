@@ -5,7 +5,7 @@ import useShowToast from "../../hooks/useShowToast";
 import useAuthStore from "../../store/authStore";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 
-const GoogleAuth =({ prefix }) => {
+const GoogleAuth = ({ prefix }) => {
     const [signInWithGoogle, , , error] = useSignInWithGoogle(auth);
     const showToast = useShowToast();
     const loginUser = useAuthStore((state) => state.login);
@@ -13,14 +13,16 @@ const GoogleAuth =({ prefix }) => {
     const handleGoogleAuth = async () => {
         try {
             const newUser = await signInWithGoogle();
-            if (!newUser && error ) {
+            if (!newUser && error) {
                 showToast("Error", error.message, "error");
                 return;
             }
-            const userRef = doc(firestore, "users", newUser.user,uid);
+            if (!newUser) return;
+
+            const userRef = doc(firestore, "users", newUser.user.uid);
             const userSnap = await getDoc(userRef);
 
-            if (userRef.exists()) {
+            if (userSnap.exists()) {
                 // login
                 const userDoc = userSnap.data();
                 localStorage.setItem("user-info", JSON.stringify(userDoc));
@@ -37,19 +39,19 @@ const GoogleAuth =({ prefix }) => {
                     followers: [],
                     following: [],
                     posts: [],
-                    createdAt: Data.now(),
+                    createdAt: Date.now(),
                 };
-                await setDoc(doc(firestore, "users", newUser.user,uid), userDoc);
+                await setDoc(doc(firestore, "users", newUser.user.uid), userDoc);
                 localStorage.setItem("user-info", JSON.stringify(userDoc));
                 loginUser(userDoc);
             }
         } catch (error) {
-            showToast("Error", error,message, "error");
+            showToast("Error", error.message, "error");
         }
     };
 
     return (
-        <Flex alignItems={"center"} justifyConetent={"center"} cursor={"pointer"} onClick={handleGoogleAuth}>
+        <Flex alignItems={"center"} justifyContent={"center"} cursor={"pointer"} onClick={handleGoogleAuth}>
             <Image src='/google.png' w={5} alt='Google logo' />
             <Text mx='2' color={"blue.500"}>
                 {prefix} with Google

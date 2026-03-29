@@ -9,7 +9,7 @@ const useFollowUser = (userId) => {
     const [isUpdating, setIsUpdating] = useState(false);
     const [isFollowing, setIsFollowing] = useState(false);
     const authUser = useAuthStore((state) => state.user);
-    const setAuthUser = useAuthStore((state) => state.user);
+    const setAuthUser = useAuthStore((state) => state.setUser);
     const { userProfile, setUserProfile } = useUserProfileStore();
     const showToast = useShowToast();
 
@@ -59,7 +59,7 @@ const useFollowUser = (userId) => {
                         followers: [...userProfile.followers, authUser.uid],
                     });
 
-                    localStorage.setItems(
+                    localStorage.setItem(
                         "user-info",
                         JSON.stringify({
                             ...authUser,

@@ -4,9 +4,17 @@ import { Link } from "react-router-dom";
 import { timeAgo } from "../../utils/timeAgo";
 
 const Comment = ({ comment }) => {
-    const { userProfile, isLoding } = useGetUserProfileById(comment.createdBy);
+    const { userProfile, isLoading } = useGetUserProfileById(comment.createdBy);
 
-    if (isLoading) return <CommentSkeleton />;
+    if (isLoading) return (
+        <Flex gap={4}>
+            <SkeletonCircle size={8} />
+            <Flex direction={"column"} gap={2} w={"full"}>
+                <Skeleton h={3} w={"40"} />
+                <Skeleton h={3} w={"70"} />
+            </Flex>
+        </Flex>
+    );
     return (
         <Flex gap={4}>
             <Link to={`/${userProfile.username}`}>
