@@ -1,7 +1,7 @@
 services:
   - type: web
     name: instagram-app
-    env: static
+    runtime: static
     rootDir: Instagram
     buildCommand: npm install && npm run build
     staticPublishPath: dist
