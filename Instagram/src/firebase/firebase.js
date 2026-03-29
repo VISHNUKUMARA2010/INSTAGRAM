@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const env = import.meta.env;
@@ -21,7 +21,11 @@ if (!env.VITE_FIREBASE_API_KEY) {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const firestore = getFirestore(app);
+const firestore = initializeFirestore(app, {
+    // Improves reliability on some hosted/mobile/corporate networks.
+    experimentalAutoDetectLongPolling: true,
+    useFetchStreams: false,
+});
 const storage = getStorage(app);
 
 export { app, auth, firestore, storage };
