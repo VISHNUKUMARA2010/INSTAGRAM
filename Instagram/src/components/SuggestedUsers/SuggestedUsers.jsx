@@ -30,7 +30,7 @@ const SuggestedUsers = () => {
 
             <Box fontSize={12} color={"gray.500"} mt={5} alignSelf={"start"}>
                 © 2026 Built By{" "}
-                <Link href='https://github.com/VISHNUKUMARA2010/INSTAGRAM.git' target='_blank' color='blue.500' fontSize={14}>
+                <Link href='https://github.com/VISHNUKUMARA2010/INSTAGRAM.git' target='_blank' color='cyan.400' fontSize={14}>
                     Vishnu
                 </Link>
             </Box>

@@ -1,0 +1,6 @@
+<svg width="200" height="56" viewBox="0 0 200 56" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="VibNet">
+  <!-- Vibration wave icon -->
+  <path d="M8 28 Q16 8 24 28 Q32 48 40 28 Q48 8 56 28 Q64 48 72 28" stroke="#00D4FF" fill="none" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- VibNet text -->
+  <text x="84" y="38" font-family="Arial, Helvetica, sans-serif" font-weight="700" font-size="30" fill="#f5f5f5">VibNet</text>
+</svg>
