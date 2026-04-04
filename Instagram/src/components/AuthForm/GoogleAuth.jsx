@@ -1,60 +1,90 @@
 import { Flex, Image, Text } from "@chakra-ui/react";
-import { useSignInWithGoogle } from "react-firebase-hooks/auth";
+import { useEffect, useMemo, useState } from "react";
 import { auth, firestore } from "../../firebase/firebase";
 import useShowToast from "../../hooks/useShowToast";
 import useAuthStore from "../../store/authStore";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { GoogleAuthProvider, getRedirectResult, signInWithRedirect } from "firebase/auth";
 
 const GoogleAuth = ({ prefix }) => {
-    const [signInWithGoogle, , , error] = useSignInWithGoogle(auth);
+    const provider = useMemo(() => new GoogleAuthProvider(), []);
+    const [isLoading, setIsLoading] = useState(false);
     const showToast = useShowToast();
     const loginUser = useAuthStore((state) => state.login);
 
+    const upsertAndLoginUser = async (firebaseUser) => {
+        const userRef = doc(firestore, "users", firebaseUser.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (userSnap.exists()) {
+            const userDoc = userSnap.data();
+            localStorage.setItem("user-info", JSON.stringify(userDoc));
+            loginUser(userDoc);
+            return;
+        }
+
+        const userDoc = {
+            uid: firebaseUser.uid,
+            email: firebaseUser.email,
+            username: firebaseUser.email.split("@")[0],
+            fullName: firebaseUser.displayName,
+            bio: "",
+            profilePicURL: firebaseUser.photoURL,
+            followers: [],
+            following: [],
+            posts: [],
+            createdAt: Date.now(),
+        };
+        await setDoc(doc(firestore, "users", firebaseUser.uid), userDoc);
+        localStorage.setItem("user-info", JSON.stringify(userDoc));
+        loginUser(userDoc);
+    };
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const handleRedirectResult = async () => {
+            try {
+                const result = await getRedirectResult(auth);
+                if (!result?.user || !isMounted) return;
+
+                await upsertAndLoginUser(result.user);
+            } catch (error) {
+                if (!isMounted) return;
+                showToast("Error", error.message, "error");
+            } finally {
+                if (isMounted) setIsLoading(false);
+            }
+        };
+
+        handleRedirectResult();
+
+        return () => {
+            isMounted = false;
+        };
+    }, []);
+
     const handleGoogleAuth = async () => {
         try {
-            const newUser = await signInWithGoogle();
-            if (!newUser && error) {
-                showToast("Error", error.message, "error");
-                return;
-            }
-            if (!newUser) return;
-
-            const userRef = doc(firestore, "users", newUser.user.uid);
-            const userSnap = await getDoc(userRef);
-
-            if (userSnap.exists()) {
-                // login
-                const userDoc = userSnap.data();
-                localStorage.setItem("user-info", JSON.stringify(userDoc));
-                loginUser(userDoc);
-            } else {
-                // signup
-                const userDoc = {
-                    uid: newUser.user.uid,
-                    email: newUser.user.email,
-                    username: newUser.user.email.split("@")[0],
-                    fullName: newUser.user.displayName,
-                    bio: "",
-                    profilePicURL: newUser.user.photoURL,
-                    followers: [],
-                    following: [],
-                    posts: [],
-                    createdAt: Date.now(),
-                };
-                await setDoc(doc(firestore, "users", newUser.user.uid), userDoc);
-                localStorage.setItem("user-info", JSON.stringify(userDoc));
-                loginUser(userDoc);
-            }
+            setIsLoading(true);
+            await signInWithRedirect(auth, provider);
         } catch (error) {
+            setIsLoading(false);
             showToast("Error", error.message, "error");
         }
     };
 
     return (
-        <Flex alignItems={"center"} justifyContent={"center"} cursor={"pointer"} onClick={handleGoogleAuth}>
+        <Flex
+            alignItems={"center"}
+            justifyContent={"center"}
+            cursor={isLoading ? "not-allowed" : "pointer"}
+            opacity={isLoading ? 0.7 : 1}
+            onClick={isLoading ? undefined : handleGoogleAuth}
+        >
             <Image src='/google.png' w={5} alt='Google logo' />
             <Text mx='2' color={"blue.500"}>
-                {prefix} with Google
+                {isLoading ? "Redirecting to Google..." : `${prefix} with Google`}
             </Text>
         </Flex>
     );

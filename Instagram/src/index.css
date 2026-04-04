@@ -1,3 +1,91 @@
+:root {
+    --bg-base: #050b18;
+    --bg-soft: #0f1b35;
+    --brand-cyan: #62d7ff;
+}
+
+body {
+    margin: 0;
+    position: relative;
+    overflow-x: hidden;
+    background:
+    radial-gradient(circle at 14% 16%, rgba(98, 215, 255, 0.2), transparent 36%),
+    radial-gradient(circle at 84% 86%, rgba(22, 178, 255, 0.16), transparent 42%),
+        linear-gradient(160deg, var(--bg-base), var(--bg-soft));
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.16), transparent 30%),
+        radial-gradient(circle at 88% 92%, rgba(125, 220, 255, 0.14), transparent 28%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+body::after {
+    content: "";
+    position: fixed;
+    top: -20%;
+    left: -18%;
+    width: 56vw;
+    height: 36vw;
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0));
+    transform: rotate(-16deg);
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 0;
+}
+
+#root {
+    position: relative;
+    z-index: 1;
+}
+
+.auth-shell {
+    position: relative;
+    overflow: hidden;
+}
+
+.auth-shell::before {
+    content: "";
+    position: absolute;
+    inset: -8% -6%;
+    background-image: url('/logo.svg');
+    background-repeat: no-repeat;
+    background-position: 58% 44%;
+    background-size: min(88vw, 980px);
+    opacity: 0.18;
+    filter: drop-shadow(0 0 36px rgba(98, 215, 255, 0.35));
+    transform: rotate(-7deg);
+    pointer-events: none;
+}
+
+.auth-shell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 52% 48%, rgba(10, 20, 40, 0.34), rgba(6, 12, 25, 0.66) 62%),
+        linear-gradient(120deg, rgba(5, 10, 22, 0.5), rgba(8, 16, 34, 0.38));
+    pointer-events: none;
+}
+
+.auth-shell > * {
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 768px) {
+    .auth-shell::before {
+        background-position: 50% 18%;
+        background-size: min(120vw, 760px);
+        opacity: 0.12;
+    }
+}
+
 ::-webkit-scrollbar {
     width: 10px;
 }

@@ -52,9 +52,34 @@ const FeedPost = ({ post }) => {
     }, [isInView, isDirectVideo]);
 
     return (
-        <>
+        <Box
+            position='relative'
+            mb={8}
+            p={{ base: 3, md: 4 }}
+            border='1px solid'
+            borderColor='rgba(170, 228, 255, 0.3)'
+            borderRadius={18}
+            bg='linear-gradient(160deg, rgba(14, 28, 54, 0.58), rgba(5, 14, 30, 0.5))'
+            backdropFilter='blur(14px)'
+            boxShadow='inset 0 1px 0 rgba(255,255,255,0.18), 0 24px 44px rgba(0, 0, 0, 0.32), 0 0 28px rgba(98, 215, 255, 0.1)'
+            transition='transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease'
+            _hover={{
+                transform: 'translateY(-2px)',
+                borderColor: 'rgba(194, 235, 255, 0.5)',
+                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2), 0 26px 50px rgba(0, 0, 0, 0.38), 0 0 32px rgba(98, 215, 255, 0.14)',
+            }}
+            _before={{
+                content: '""',
+                position: 'absolute',
+                inset: '0 0 auto 0',
+                height: '72px',
+                borderTopRadius: '18px',
+                background: 'linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02))',
+                pointerEvents: 'none',
+            }}
+        >
             <PostHeader post={post} creatorProfile={userProfile} />
-            <Box my={2} borderRadius={4} overflow={"hidden"} ref={mediaWrapperRef}>
+            <Box my={3} borderRadius={14} overflow={"hidden"} ref={mediaWrapperRef} border='1px solid' borderColor='rgba(164, 222, 255, 0.24)'>
                 {isVideoPost ? (
                     youtubeEmbedUrl ? (
                         <iframe
@@ -90,11 +115,11 @@ const FeedPost = ({ post }) => {
                         </Box>
                     )
                 ) : (
-                    <Image src={mediaSrc} alt={"FEED POST IMG"} />
+                    <Image src={mediaSrc} alt={"FEED POST IMG"} w='full' maxH='600px' objectFit='cover' />
                 )}
             </Box>
             <PostFooter post={post} creatorProfile={userProfile} />
-        </>
+        </Box>
     );
 };
 

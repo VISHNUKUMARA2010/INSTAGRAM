@@ -29,16 +29,24 @@ const Notifications = () => {
                 <Flex
                     alignItems={"center"}
                     gap={4}
-                    _hover={{ bg: "whiteAlpha.400" }}
-                    borderRadius={6}
-                    p={2}
+                    bg='rgba(255,255,255,0.04)'
+                    _hover={{
+                        bg: "linear-gradient(180deg, rgba(98, 215, 255, 0.24), rgba(98, 215, 255, 0.12))",
+                        borderColor: "rgba(165, 229, 255, 0.44)",
+                        transform: 'translateX(2px)',
+                    }}
+                    border='1px solid rgba(176, 229, 255, 0.18)'
+                    borderRadius={14}
+                    p={3}
                     w={{ base: 10, md: "full" }}
                     justifyContent={{ base: "center", md: "flex-start" }}
                     onClick={onOpen}
                     cursor={"pointer"}
+                    transition='all 0.2s ease'
+                    boxShadow='inset 0 1px 0 rgba(255,255,255,0.08)'
                 >
                     <NotificationsLogo />
-                    <Box display={{ base: "none", md: "block" }}>Notifications</Box>
+                    <Box display={{ base: "none", md: "block" }} fontWeight={500}>Notifications</Box>
                 </Flex>
             </Tooltip>
 

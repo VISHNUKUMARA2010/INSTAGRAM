@@ -1,6 +1,6 @@
-# Instagram Clone
+# VibNet
 
-Production-ready Instagram-style social application built with React and Firebase.
+Production-ready social application built with React and Firebase.
 
 ## Overview
 

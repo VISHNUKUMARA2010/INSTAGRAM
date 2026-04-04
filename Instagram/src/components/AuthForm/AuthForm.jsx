@@ -9,7 +9,15 @@ const AuthForm = () => {
 
     return (
         <>
-            <Box border={"1px solid gray"} borderRadius={4} padding={5}>
+            <Box
+                border={"1px solid"}
+                borderColor={'whiteAlpha.300'}
+                borderRadius={12}
+                padding={6}
+                bg={'rgba(6, 14, 29, 0.72)'}
+                boxShadow={'xl'}
+                backdropFilter={'blur(8px)'}
+            >
                 <VStack spacing={4}>
                     <Image src='/logo.svg' h={14} cursor={"pointer"} alt='VibNet' />
 
@@ -28,7 +36,14 @@ const AuthForm = () => {
                 </VStack>
             </Box>
 
-            <Box border={"1px solid gray"} borderRadius={4} padding={5}>
+            <Box
+                border={"1px solid"}
+                borderColor={'whiteAlpha.300'}
+                borderRadius={12}
+                padding={5}
+                bg={'rgba(6, 14, 29, 0.66)'}
+                boxShadow={'lg'}
+            >
                 <Flex alignItems={"center"} justifyContent={"center"}>
                     <Box mx={2} fontSize={14}>
                         {isLogin ? "Don't have an account? " : "Already have an account? "}

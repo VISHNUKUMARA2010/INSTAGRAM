@@ -15,21 +15,27 @@ const FeedPosts = () => {
             : posts.filter((post) => authUser?.following?.includes(post.createdBy));
 
     return (
-        <Container maxW={"container.sm"} py={10} px={2}>
-            <Flex gap={2} mb={6}>
+        <Container maxW={"container.md"} py={{ base: 4, md: 8 }} px={{ base: 0, md: 2 }}>
+            <Flex gap={2} mb={6} p={1} bg='whiteAlpha.100' borderRadius={12} w='fit-content'>
                 <Button
                     size='sm'
                     onClick={() => setFeedType("global")}
-                    bg={feedType === "global" ? "blue.500" : "whiteAlpha.200"}
-                    _hover={{ bg: feedType === "global" ? "blue.600" : "whiteAlpha.300" }}
+                    borderRadius={10}
+                    px={5}
+                    bg={feedType === "global" ? "blue.400" : "transparent"}
+                    color={feedType === "global" ? "#041126" : "whiteAlpha.800"}
+                    _hover={{ bg: feedType === "global" ? "blue.300" : "whiteAlpha.200" }}
                 >
                     Global Feed
                 </Button>
                 <Button
                     size='sm'
                     onClick={() => setFeedType("following")}
-                    bg={feedType === "following" ? "blue.500" : "whiteAlpha.200"}
-                    _hover={{ bg: feedType === "following" ? "blue.600" : "whiteAlpha.300" }}
+                    borderRadius={10}
+                    px={5}
+                    bg={feedType === "following" ? "blue.400" : "transparent"}
+                    color={feedType === "following" ? "#041126" : "whiteAlpha.800"}
+                    _hover={{ bg: feedType === "following" ? "blue.300" : "whiteAlpha.200" }}
                 >
                     Following Feed
                 </Button>
@@ -37,34 +43,44 @@ const FeedPosts = () => {
 
             {isLoading &&
                 [0, 1, 2].map((_, idx) => (
-                    <VStack key={idx} gap={4} alignItems={"flex-start"} mb={10}>
+                    <VStack
+                        key={idx}
+                        gap={4}
+                        alignItems={"flex-start"}
+                        mb={8}
+                        p={4}
+                        border='1px solid'
+                        borderColor='whiteAlpha.200'
+                        borderRadius={16}
+                        bg='rgba(6, 14, 28, 0.72)'
+                    >
                         <Flex gap='2'>
                             <SkeletonCircle size='10' />
                             <VStack gap={2} alignItems={"flex-start"}>
-                                 <Skeleton height='10px' w={"200px"} />
-                                 <Skeleton height='10px' w={"200px"} />
-                             </VStack>
-                         </Flex>
-                         <Skeleton w={"full"}>
-                             <Box h={"400px"}>contents wrapped</Box>
-                         </Skeleton>
-                     </VStack>   
+                                <Skeleton height='10px' w={"200px"} />
+                                <Skeleton height='10px' w={"160px"} />
+                            </VStack>
+                        </Flex>
+                        <Skeleton w={"full"} borderRadius={12}>
+                            <Box h={"420px"}>contents wrapped</Box>
+                        </Skeleton>
+                    </VStack>
                 ))}
 
             {!isLoading && filteredPosts.length > 0 && filteredPosts.map((post) => <FeedPost key={post.id} post={post} />)}
             {!isLoading && filteredPosts.length === 0 && (
-                <>
-                    <Text fontSize={"md"} color={"red.400"}>
+                <Box p={6} border='1px solid' borderColor='whiteAlpha.200' borderRadius={16} bg='rgba(6, 14, 28, 0.72)'>
+                    <Text fontSize={"md"} color={"whiteAlpha.900"} fontWeight={600}>
                         {feedType === "following"
                             ? "No posts from followed users yet."
                             : "No posts available yet."}
                     </Text>
-                    <Text color={"red.400"}>
+                    <Text color={"whiteAlpha.700"} mt={1}>
                         {feedType === "following"
                             ? "Follow users to see their posts here."
                             : "Be the first to create a post."}
                     </Text>
-                </>
+                </Box>
             )}
         </Container>
     );

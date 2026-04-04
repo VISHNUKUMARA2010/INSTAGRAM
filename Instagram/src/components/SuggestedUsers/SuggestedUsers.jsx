@@ -10,15 +10,32 @@ const SuggestedUsers = () => {
     if (isLoading) return null;
 
     return (
-        <VStack py={8} px={6} gap={4}>
+        <VStack
+            py={8}
+            px={6}
+            gap={4}
+            alignItems='stretch'
+            position='relative'
+            _before={{
+                content: '""',
+                position: 'absolute',
+                top: '-16%',
+                left: '-30%',
+                width: '170%',
+                height: '42%',
+                background: 'linear-gradient(120deg, rgba(255,255,255,0.14), rgba(255,255,255,0))',
+                transform: 'rotate(-9deg)',
+                pointerEvents: 'none',
+            }}
+        >
             <SuggestedHeader />
 
             {suggestedUsers.length !== 0 && (
                 <Flex alignItems={"center"} justifyContent={"space-between"} w={"full"}>
-                    <Text fontSize={12} fontWeight={"bold"} color={"gray.500"}>
-                        Suggested for you
+                    <Text fontSize={12} fontWeight={"bold"} color={"whiteAlpha.600"} textTransform='uppercase' letterSpacing={1.2}>
+                        Suggested creators
                     </Text>
-                    <Text fontSize={12} fontWeight={"bold"} _hover={{ color: "gray.400" }} cursor={"pointer"}>
+                    <Text fontSize={12} fontWeight={"bold"} _hover={{ color: "white" }} color='blue.200' cursor={"pointer"}>
                         See All
                     </Text>
                 </Flex>
@@ -28,9 +45,20 @@ const SuggestedUsers = () => {
                 <SuggestedUser user={user} key={user.id} />
             ))}
 
-            <Box fontSize={12} color={"gray.500"} mt={5} alignSelf={"start"}>
-                © 2026 Built By{" "}
-                <Link href='https://github.com/VISHNUKUMARA2010/INSTAGRAM.git' target='_blank' color='cyan.400' fontSize={14}>
+            <Box
+                fontSize={12}
+                color={"whiteAlpha.700"}
+                mt={6}
+                alignSelf={"start"}
+                w='full'
+                p={3}
+                borderRadius={12}
+                bg='rgba(255,255,255,0.035)'
+                border='1px solid rgba(180, 230, 255, 0.16)'
+                boxShadow='inset 0 1px 0 rgba(255,255,255,0.08)'
+            >
+                © 2026 VibeNet Experience by {" "}
+                <Link href='https://github.com/VISHNUKUMARA2010' target='_blank' color='cyan.400' fontSize={14}>
                     Vishnu
                 </Link>
             </Box>
