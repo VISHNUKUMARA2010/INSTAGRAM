@@ -4,7 +4,7 @@ import { auth, firestore } from "../../firebase/firebase";
 import useShowToast from "../../hooks/useShowToast";
 import useAuthStore from "../../store/authStore";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { GoogleAuthProvider, getRedirectResult, signInWithRedirect } from "firebase/auth";
+import { GoogleAuthProvider, getRedirectResult, signInWithPopup, signInWithRedirect } from "firebase/auth";
 
 const GoogleAuth = ({ prefix }) => {
     const provider = useMemo(() => new GoogleAuthProvider(), []);
@@ -46,9 +46,13 @@ const GoogleAuth = ({ prefix }) => {
         const handleRedirectResult = async () => {
             try {
                 const result = await getRedirectResult(auth);
-                if (!result?.user || !isMounted) return;
+                if (!isMounted) return;
 
-                await upsertAndLoginUser(result.user);
+                // On some browsers/providers redirect result can be null while currentUser is already hydrated.
+                const resolvedUser = result?.user || auth.currentUser;
+                if (!resolvedUser) return;
+
+                await upsertAndLoginUser(resolvedUser);
             } catch (error) {
                 if (!isMounted) return;
                 showToast("Error", error.message, "error");
@@ -67,8 +71,28 @@ const GoogleAuth = ({ prefix }) => {
     const handleGoogleAuth = async () => {
         try {
             setIsLoading(true);
+            const result = await signInWithPopup(auth, provider);
+            if (result?.user) {
+                await upsertAndLoginUser(result.user);
+                setIsLoading(false);
+                return;
+            }
+
             await signInWithRedirect(auth, provider);
         } catch (error) {
+            const fallbackCodes = ["auth/popup-blocked", "auth/popup-closed-by-user", "auth/cancelled-popup-request"];
+
+            if (fallbackCodes.includes(error?.code)) {
+                try {
+                    await signInWithRedirect(auth, provider);
+                    return;
+                } catch (redirectError) {
+                    setIsLoading(false);
+                    showToast("Error", redirectError.message, "error");
+                    return;
+                }
+            }
+
             setIsLoading(false);
             showToast("Error", error.message, "error");
         }
@@ -84,7 +108,7 @@ const GoogleAuth = ({ prefix }) => {
         >
             <Image src='/google.png' w={5} alt='Google logo' />
             <Text mx='2' color={"blue.500"}>
-                {isLoading ? "Redirecting to Google..." : `${prefix} with Google`}
+                {isLoading ? "Connecting to Google..." : `${prefix} with Google`}
             </Text>
         </Flex>
     );
